@@ -1,6 +1,6 @@
 # DC_motor_mochi_blimp
 
-# Upload the file "AsyncUDPServerAIRLabActualOriginal"
+Upload the file "AsyncUDPServerAIRLabActualOriginal"
 # It will return the UDP_IP
 
 # In the optitrack_natnet-main folder, there is a file called optitrackPilot.py.
