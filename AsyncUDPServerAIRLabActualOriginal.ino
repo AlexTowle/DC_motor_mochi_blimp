@@ -7,8 +7,8 @@
 #define THRUST1 A2
 #define THRUST2 A3
  
-const char * ssid = "AIRLab-BigLab";
-const char * password = "Airlabrocks2022";
+const char * ssid = "*********";
+const char * password = "*********";
 Servo servo1;
 Servo servo2; 
 
