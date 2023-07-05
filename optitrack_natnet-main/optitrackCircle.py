@@ -11,7 +11,7 @@ from scipy.spatial.transform import Rotation as R
 
 positions = {}
 rotations = {}
-rotational_matrices = {}
+#rotational_matrices = {}
 
 # udp params
 UDP_IP = "192.168.0.36"
@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
             clientAddress = "192.168.0.63"
             optitrackServerAddress = "192.168.0.4"
-            robot_id = 369
+            robot_id = 371
 
             # This will create a new NatNet client
             streaming_client = NatNetClient()
@@ -99,9 +99,9 @@ if __name__ == "__main__":
             # This will run perpetually, and operate on a separate thread.
             is_running = streaming_client.run()
             z_pid = PID(3, 0, 1, setpoint = 1, sample_time=0.01)
-            yaw_pid = PID(0.001, 0, 0, setpoint = 0)
-            x_pid = PID(0.0001, 0, 0, setpoint = 1)
-            y_pid = PID(0.1, 0, 0.5, setpoint = 3)
+            yaw_pid = PID(0.02, 0, 0, setpoint = 0.1*1.2)
+            x_pid = PID(0.02, 0, 0, setpoint = 0.05*0.5)
+            y_pid = PID(0.02, 0, 0, setpoint = -0.1)
             last_yaw = 0
             last_x = 0
             last_y = 0
@@ -110,7 +110,7 @@ if __name__ == "__main__":
             while is_running:
                 if robot_id in positions:
                     # last position
-                    print('Last position', positions[robot_id], ' rotation', rotations[robot_id])
+                    #print('Last position', positions[robot_id], ' rotation', rotations[robot_id])
                     #print(rotations[robot_id][2])
                     # Get the joystick readings
                     #pygame.event.pump()
@@ -125,7 +125,7 @@ if __name__ == "__main__":
                     #print("Flipped Matrix: ", np.flip(rotational_matrices[robot_id], (-0, 1)))
                     #print(rotT)
 
-                    world_yaw_velocity = (rotations[robot_id][2] - last_yaw) / 0.01
+                    world_yaw_velocity = (rotations[robot_id][2] - last_yaw) / 0.01 * math.pi/180
                     last_yaw = rotations[robot_id][2]
                     world_x_velocity = (positions[robot_id][0] - last_x) / 0.01
                     last_x = positions[robot_id][0]
@@ -135,9 +135,10 @@ if __name__ == "__main__":
                     #last_z_velocity = world_z_velocity
                     #print(world_yaw_velocity)
 
-                    body_x_velocity = world_x_velocity * math.cos(rotations[robot_id][2]) - world_y_velocity * math.sin(rotations[robot_id][2])
-                    body_y_velocity = world_x_velocity * math.sin(rotations[robot_id][2]) + world_y_velocity * math.cos(rotations[robot_id][2])
+                    body_x_velocity = world_x_velocity * math.cos(rotations[robot_id][2] * math.pi/180) - world_y_velocity * math.sin(rotations[robot_id][2] * math.pi/180)
+                    body_y_velocity = world_x_velocity * math.sin(rotations[robot_id][2] * math.pi/180) + world_y_velocity * math.cos(rotations[robot_id][2] * math.pi/180)
                     #print(body_x_velocity)
+                    
 
                     xy_distance = math.sqrt((x_pid.setpoint - positions[robot_id][0])**2 + (y_pid.setpoint - positions[robot_id][1])**2)
                     #print(xy_distance)
@@ -146,7 +147,7 @@ if __name__ == "__main__":
                     #taux = joystick.get_axis(0) # left handler: left-right torque
                     #taux = -rotT[1]
                     
-                    taux = 0
+                    taux = 0#y_pid(body_y_velocity)
                     #print(taux)
 
                     fz = z_pid(positions[robot_id][2]) #0.11 * (target_height - positions[robot_id][2])#-joystick.get_axis(4) # right handler: up-down, inverted
@@ -206,7 +207,7 @@ if __name__ == "__main__":
                     message = struct.pack('<ffff', f1, f2, t1, t2)
         
                     #print(f1, f2, t1, t2)
-                    #udp_send(sock, UDP_IP, UDP_PORT, message)
+                    udp_send(sock, UDP_IP, UDP_PORT, message)
                     # print(message)
                 time.sleep(0.01)
     except:
