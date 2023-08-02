@@ -14,7 +14,7 @@ rotations = {}
 #rotational_matrices = {}
 
 # udp params
-UDP_IP_TOW = "192.168.0.5"
+UDP_IP_TOW = "192.168.0.24"
 UDP_IP_SECOND_TOW = "192.168.0.29"
 UDP_IP_LEAD = "192.168.0.27"
 UDP_PORT = 1234
@@ -83,8 +83,8 @@ if __name__ == "__main__":
             #tow_z_pid = PID(3, 0, 1, setpoint = 1, sample_time=0.01)
             lead_z_pid = PID(3, 0, 1, setpoint = 1.5, sample_time=0.01)
             yaw_pid = PID(0.001, 0, 0.001, setpoint = 0)
-            x_pid = PID(0.1, 0.01, 0.5, setpoint = 2)
-            y_pid = PID(0.1, 0, 0.5, setpoint = 3)
+            x_pid = PID(1, 0.01, 0.5, setpoint = 3)
+            y_pid = PID(1, 0.01, 0.05, setpoint = 0)
             last_x = 0
             last_y = 0
 
@@ -127,23 +127,23 @@ if __name__ == "__main__":
                     last_y = positions[lead_robot_id][1]
                     body_x_velocity = world_x_velocity * math.cos(rotations[lead_robot_id][2] * math.pi/180) - world_y_velocity * math.sin(rotations[lead_robot_id][2] * math.pi/180)
 
-                    MAX_THRUST = 20#17
-                    tow1_f1 = 3#math.sqrt(tow_f1z**2) * MAX_THRUST
-                    tow1_f2 = 3#math.sqrt(tow_f2z**2) * MAX_THRUST
-                    tow1_t1 = (145.0)
-                    tow1_t2 = (35.0)
+                    MAX_THRUST = 10#17
+                    tow1_f1 = 4#math.sqrt(tow_f1z**2) * MAX_THRUST
+                    tow1_f2 = 4#math.sqrt(tow_f2z**2) * MAX_THRUST
+                    tow1_t1 = (150.0)
+                    tow1_t2 = (30.0)
                     #print(f1, f2, t1, t2)
                     #print(t1, t2)
                     #print(f1, f2)
 
                     tow2_f1 = 4#math.sqrt(tow_f1z**2) * MAX_THRUST
                     tow2_f2 = 4#math.sqrt(tow_f2z**2) * MAX_THRUST
-                    tow2_t1 = (145.0)
-                    tow2_t2 = (35.0)
+                    tow2_t1 = (150.0)
+                    tow2_t2 = (30.0)
 
 
                     lead_fx = x_pid(positions[lead_robot_id][0])
-                    lead_taux = 0
+                    lead_taux = y_pid(positions[lead_robot_id][1])
                     lead_fz = lead_z_pid(positions[lead_robot_id][2]) + 2
                     if lead_fz > 1:
                         lead_fz = 1
@@ -170,8 +170,8 @@ if __name__ == "__main__":
                     #print(f1, f2, t1, t2)
                     udp_send_tow(sock, UDP_IP_TOW, UDP_PORT, message_tow1)
                     udp_send_tow(sock, UDP_IP_SECOND_TOW, UDP_PORT, message_tow2)
-                    #udp_send_tow(sock, UDP_IP_LEAD, UDP_PORT, message_lead)
-                    # print(message)
+                    udp_send_tow(sock, UDP_IP_LEAD, UDP_PORT, message_lead)
+                    #print(message)
                 time.sleep(0.01)
     except:
         message_tow1 = struct.pack('<ffff', 0, 0, 90, 90)
