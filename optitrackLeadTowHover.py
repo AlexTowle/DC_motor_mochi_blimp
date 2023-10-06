@@ -82,7 +82,7 @@ if __name__ == "__main__":
             is_running = streaming_client.run()
             #tow_z_pid = PID(3, 0, 1, setpoint = 1, sample_time=0.01)
             lead_z_pid = PID(3, 0, 1, setpoint = 1.5, sample_time=0.01)
-            yaw_pid = PID(0.001, 0, 0.001, setpoint = 0)
+            yaw_pid = PID(0.001, 0.0001, 0.001, setpoint = 0)
             x_pid = PID(1, 0.01, 0.5, setpoint = 3)
             y_pid = PID(1, 0.01, 0.05, setpoint = 0)
             last_x = 0
